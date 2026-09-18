@@ -252,8 +252,11 @@ def exercise_history(exercise_name):
     conn.close()
     return render_template('exercise.html', exercise_name=exercise_name, entries=entries)
 
+# Runs on import too (not just "python3 app.py"), so the database tables
+# get created whether Flask's dev server OR gunicorn (used on Render) starts this app.
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     port = int(os.environ.get('PORT', 5001))
     debug_mode = os.environ.get('FLASK_DEBUG', 'true').lower() == 'true'
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
