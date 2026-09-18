@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exercise_name }} History</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #1c1c1e;
+            --card-2: #2c2c2e;
+            --text: #ffffff;
+            --text-dim: #8e8e93;
+            --green: #92e82a;
+            --cyan: #00e5ff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Helvetica, Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+        }
+        h1 { font-weight: 700; letter-spacing: -0.5px; }
+        .back {
+            color: var(--cyan);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .chart-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .entry {
+            background: var(--card);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--green);
+            font-size: 14px;
+        }
+        .entry .date { color: var(--text-dim); font-size: 12px; }
+    </style>
+</head>
+<body>
+    <a class="back" href="/">&larr; Back</a>
+    <h1>{{ exercise_name }}</h1>
+
+    <div class="chart-card">
+        <canvas id="progressChart"></canvas>
+    </div>
+
+    <h2 style="font-size:16px;">History</h2>
+    {% for entry in entries|reverse %}
+        <div class="entry">
+            {{ entry[3] }} sets × {{ entry[4] }} reps @ {{ entry[5] }} kg
+            <div class="date">{{ entry[7] }}</div>
+        </div>
+    {% else %}
+        <p>No entries yet for this exercise.</p>
+    {% endfor %}
+
+    <script>
+        const dates = {{ entries | map(attribute=7) | list | tojson }};
+        const weights = {{ entries | map(attribute=5) | list | tojson }};
+
+        new Chart(document.getElementById('progressChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Weight (kg)',
+                    data: weights,
+                    borderColor: '#92e82a',
+                    backgroundColor: 'rgba(146, 232, 42, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#92e82a'
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#8e8e93' }, grid: { color: '#38383a' } },
+                    y: { ticks: { color: '#8e8e93' }, grid: { color: '#38383a' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

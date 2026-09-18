@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="/static/icon.png">
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #1c1c1e;
+            --card-2: #2c2c2e;
+            --text: #ffffff;
+            --text-dim: #8e8e93;
+            --red: #fc3158;
+            --green: #92e82a;
+            --cyan: #00e5ff;
+            --blue: #0a84ff;
+            --separator: #38383a;
+        }
+        * {
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Helvetica, Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+        }
+        h1 {
+            text-align: center;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin: 24px 0 12px 0;
+        }
+        form {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0 14px 0;
+            border: none;
+            background: var(--card-2);
+            color: var(--text);
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        input::placeholder {
+            color: var(--text-dim);
+        }
+        label {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .workout {
+            background: var(--card);
+            padding: 14px 16px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--green);
+        }
+        .workout b {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .workout b a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        .workout span {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+        .workout-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .workout-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .workout-actions a, .workout-actions button {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: none;
+            text-decoration: none;
+        }
+        .edit-link {
+            background: var(--card-2);
+            color: var(--cyan);
+        }
+        .delete-btn {
+            background: var(--card-2);
+            color: var(--red);
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+        .topbar a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+        }
+        .stat-card:nth-child(1) .value { color: var(--red); }
+        .stat-card:nth-child(2) .value { color: var(--green); }
+        .stat-card:nth-child(3) .value { color: var(--cyan); }
+        .stat-card:nth-child(4) .value { color: var(--blue); }
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .tracker-card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .tracker-distance {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--cyan);
+            letter-spacing: -1px;
+            margin: 6px 0;
+        }
+        .tracker-status {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 14px;
+        }
+        .tracker-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .tracker-buttons button {
+            flex: 1;
+        }
+        #startBtn { background: var(--green); color: #003300; }
+        #stopBtn { background: var(--card-2); color: var(--text); display: none; }
+        #saveBtn { background: var(--cyan); color: #002222; display: none; margin-top: 10px; }
+        .achievements {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .achievements h3 {
+            margin-top: 0;
+            font-size: 13px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .badge {
+            display: inline-block;
+            background: var(--card-2);
+            border: 1px solid var(--separator);
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 4px 4px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <span>{{ email }}</span>
+        <a href="/logout">Log out</a>
+    </div>
+    <h1>💪 Fitness Tracker</h1>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="value">{{ stats.total_workouts }}</div>
+            <div class="label">Workouts</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">🔥{{ stats.streak }}</div>
+            <div class="label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">{{ stats.total_volume }}</div>
+            <div class="label">kg Total Volume</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">{{ stats.total_distance }}</div>
+            <div class="label">km Tracked</div>
+        </div>
+    </div>
+
+    {% if stats.achievements %}
+    <div class="achievements">
+        <h3>🏅 Achievements</h3>
+        {% for badge in stats.achievements %}
+            <span class="badge">{{ badge }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="tracker-card">
+        <div class="tracker-status" id="trackerStatus">Track a run or walk using GPS</div>
+        <div class="tracker-distance" id="trackerDistance">0.00 km</div>
+        <div class="tracker-buttons">
+            <button id="startBtn" onclick="startTracking()">▶ Start</button>
+            <button id="stopBtn" onclick="stopTracking()">⏹ Stop</button>
+        </div>
+        <form id="saveForm" action="/add_run" method="POST">
+            <input type="hidden" name="distance" id="distanceInput">
+            <button id="saveBtn" type="submit">Save This Run</button>
+        </form>
+    </div>
+
+    <form action="/add" method="POST">
+        <label>Exercise</label>
+        <input type="text" name="exercise" list="exercise-options" required placeholder="e.g. Bench Press" autocomplete="off">
+        <datalist id="exercise-options">
+            <option value="Bench Press">
+            <option value="Squat">
+            <option value="Deadlift">
+            <option value="Overhead Press">
+            <option value="Barbell Row">
+            <option value="Pull Up">
+            <option value="Push Up">
+            <option value="Lat Pulldown">
+            <option value="Bicep Curl">
+            <option value="Tricep Extension">
+            <option value="Leg Press">
+            <option value="Lunges">
+            <option value="Plank">
+            <option value="Running">
+            <option value="Cycling">
+        </datalist>
+
+        <label>Sets</label>
+        <input type="number" name="sets" required placeholder="e.g. 3">
+
+        <label>Reps</label>
+        <input type="number" name="reps" required placeholder="e.g. 10">
+
+        <label>Weight (kg)</label>
+        <input type="number" step="0.5" name="weight" required placeholder="e.g. 40">
+
+        <button type="submit">Log Workout</button>
+    </form>
+
+    <h2>Your Workouts</h2>
+    {% for workout in workouts %}
+        <div class="workout">
+            <div class="workout-row">
+                {% if workout[6] and workout[6] > 0 %}
+                    <b>{{ workout[2] }}</b>
+                {% else %}
+                    <b><a href="/exercise/{{ workout[2] }}">{{ workout[2] }}</a></b>
+                {% endif %}
+                <div class="workout-actions">
+                    {% if not (workout[6] and workout[6] > 0) %}
+                        <a class="edit-link" href="/edit/{{ workout[0] }}">Edit</a>
+                    {% endif %}
+                    <form action="/delete/{{ workout[0] }}" method="POST" style="margin:0;">
+                        <button class="delete-btn" type="submit" onclick="return confirm('Delete this workout?')">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% if workout[6] and workout[6] > 0 %}
+                <span>{{ "%.2f"|format(workout[6]) }} km &middot; {{ workout[7] }}</span>
+            {% else %}
+                <span>{{ workout[3] }} sets × {{ workout[4] }} reps @ {{ workout[5] }} kg &middot; {{ workout[7] }}</span>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>No workouts logged yet. Add your first one above!</p>
+    {% endfor %}
+
+    <script>
+        let watchId = null;
+        let startTime = null;
+        let totalDistance = 0; // in km
+        let lastPosition = null;
+
+        // Haversine formula: calculates distance in km between two GPS coordinates
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) ** 2;
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function startTracking() {
+            if (!navigator.geolocation) {
+                document.getElementById('trackerStatus').innerText = "GPS not supported on this browser.";
+                return;
+            }
+
+            totalDistance = 0;
+            lastPosition = null;
+            document.getElementById('trackerDistance').innerText = "0.00 km";
+            document.getElementById('trackerStatus').innerText = "Tracking... keep this page open";
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('saveBtn').style.display = 'none';
+
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    if (lastPosition) {
+                        const segment = haversineDistance(
+                            lastPosition.lat, lastPosition.lon, latitude, longitude
+                        );
+                        // Ignore tiny GPS jitter (movements under 2 meters while standing still)
+                        if (segment > 0.002) {
+                            totalDistance += segment;
+                        }
+                    }
+                    lastPosition = { lat: latitude, lon: longitude };
+                    document.getElementById('trackerDistance').innerText = totalDistance.toFixed(2) + " km";
+                },
+                (error) => {
+                    document.getElementById('trackerStatus').innerText = "Location error: " + error.message;
+                },
+                { enableHighAccuracy: true, maximumAge: 0 }
+            );
+        }
+
+        function stopTracking() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            document.getElementById('trackerStatus').innerText = "Tracking stopped";
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+
+            if (totalDistance > 0) {
+                document.getElementById('distanceInput').value = totalDistance.toFixed(3);
+                document.getElementById('saveBtn').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
